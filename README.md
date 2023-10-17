@@ -247,6 +247,8 @@ kemudian cek dengan
 ping abimanyu.b05.com -c 5
 ping www.abimanyu.b05.com -c 5
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/045d9711-1b73-4eed-b776-d248e1dc23fd)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/c9ef04fd-bfe5-49ad-9e66-40c4918d9dba)
 
 # Question 7
 
