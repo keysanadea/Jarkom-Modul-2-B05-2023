@@ -636,19 +636,148 @@ curl abimanyu.a09.com/home
 
 Selain itu, pada subdomain www.parikesit.abimanyu.yyy.com, DocumentRoot disimpan pada /var/www/parikesit.abimanyu.yyy
 
+Hanya diperlukan setup `ServerName` dan `ServerAlias`
+
+# Abimanyu
+
+```
+echo -e '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.b05
+  ServerName parikesit.abimanyu.b05.com
+  ServerAlias www.parikesit.abimanyu.b05.com
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
+
+a2ensite parikesit.abimanyu.b05.com.conf
+```
+jangan lupa
+```
+service apache2 restart
+```
+# Client
+```
+lynx parikesit.abimanyu.b05.com
+curl parikesit.abimanyu.b05.com
+```
+
 ### Question 14
 
 Pada subdomain tersebut folder /public hanya dapat melakukan directory listing sedangkan pada folder /secret tidak dapat diakses (403 Forbidden).
 
+Karena kita ingin mengizinkan publik agar dapat melihat directory  `listing`, kita menggunakan opsi `Options +Indexes`. Sementara untuk mencegah akses ke suatu folder, kita dapat menggunakan opsi `Option -Indexes`.
+
+# Abimanyu 
+```
+echo -e '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.b05
+  ServerName parikesit.abimanyu.b05.com
+  ServerAlias www.parikesit.abimanyu.b05.com
+
+  <Directory /var/www/parikesit.abimanyu.b05/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.b05/secret>
+          Options -Indexes
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.b05/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.b05/secret"
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
+
+service apache2 restart
+```
+# Client
+```
+lynx parikesit.abimanyu.b05.com/public
+lynx parikesit.abimanyu.b05.com/secret
+```
+
 ### Question 15
 
 Buatlah kustomisasi halaman error pada folder /error untuk mengganti error kode pada Apache. Error kode yang perlu diganti adalah 404 Not Found dan 403 Forbidden.
+
+Untuk halaman HTML `error`, kita menggunakan file yang disediakan dalam `resources`, yang dapat ditemukan di direktori parikesit.abimanyu.b05.com/public/error/. Di dalam direktori tersebut, terdapat dua filr, yaitu `403.html` dan `404.html`. Selain itu, kita memanfaatkan `ErrorDocument` yang bertujuan untuk mengarahkan ke berkas yang sesuai ketika terjadi masalah saat mengakses domain yang telah ada sebelumnya.
+
+```
+echo -e '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.b05
+  ServerName parikesit.abimanyu.b05.com
+  ServerAlias www.parikesit.abimanyu.b05.com
+
+  <Directory /var/www/parikesit.abimanyu.b05/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.b05/secret>
+          Options -Indexes
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.b05/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.b05/secret"
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
+
+service apache2 restart
+```
+# Client
+```
+lynx parikesit.abimanyu.b05.com/testerror
+lynx parikesit.abimanyu.b05.com/secret
+```
 
 ### Question 16
 
 Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi 
 www.parikesit.abimanyu.yyy.com/js 
 
+Di sini, langkah yang perlu diambil adalah mengggunakan `Alias "/js" "/var/www/parikesit.abimanyu.b09/public/js"` guna membuat alamat virtual host lebih singkat. Selain itu, kami menggunakan `ServerName` dan `ServerAlias` untuk memastikan agar virtual host berjalan dengan baik.
+
+# Abimanyu
+
+```
+echo -e '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.b05
+  ServerName parikesit.abimanyu.b05.com
+  ServerAlias www.parikesit.abimanyu.b05.com
+
+  <Directory /var/www/parikesit.abimanyu.b05/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.b05/secret>
+          Options -Indexes
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.b05/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.b05/secret"
+  Alias "/js" "/var/www/parikesit.abimanyu.b05/public/js"
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
+```
+# Client
+```
+lynx parikesit.abimanyu.b05.com/js
+```
 ### Question 17
 
 Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
