@@ -271,6 +271,8 @@ kemudian cek dengan
 ping abimanyu.b05.com -c 5
 ping www.abimanyu.b05.com -c 5
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/045d9711-1b73-4eed-b776-d248e1dc23fd)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/c9ef04fd-bfe5-49ad-9e66-40c4918d9dba)
 
 # Question 7
 
@@ -280,6 +282,65 @@ Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatl
 Sebelum mulai tugas ini, konfigurasi awal harus dilakukan. Delegasi subdomain memerlukan pengaturan pada DNS Master dan DNS Slave. Selain itu, perlu menggunakan `allow-query { any; };` pada `DNS Master` dan `Slave`. Selain itu, `NS` (Name Server) juga diperlukan karena `NS` digunakan dalam delegasi zona `DNS` untuk menggunakan authoritative name server yang telah ditentukan.
 
 Di DNS Master, kita harus memasukkan entri `ns1      IN       A     10.11.2.2     ; IP Werkudara` ini untuk mendapatkan otoritas atas Werkudara. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Master`.
+<<<<<<< HEAD
+=======
+
+## Yudhistira
+```
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.b05.com. root.abimanyu.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@            IN     NS      abimanyu.b05.com.
+@            IN     A       10.11.1.2     ; IP Yudhistira
+www          IN     CNAME   abimanyu.b05.com.
+parikesit    IN     A       10.11.3.3     ; IP Abimanyu
+ns1          IN     A       10.11.2.2     ; IP Werkudara
+baratayuda   IN     NS      ns1' > /etc/bind/jarkom/abimanyu.b05.com
+
+echo "options {
+    directory \"/var/cache/bind\";
+
+    // If there is a firewall between you and nameservers you want
+    // to talk to, you may need to fix the firewall to allow multiple
+    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+    // If your ISP provided one or more IP addresses for stable
+    // nameservers, you probably want to use them as forwarders.
+    // Uncomment the following block, and insert the addresses replacing
+    // the all-0's placeholder.
+
+    // forwarders {
+    //      0.0.0.0;
+    // };
+
+    //========================================================================
+    // If BIND logs error messages about the root key being expired,
+    // you will need to update your keys.  See https://www.isc.org/bind-keys
+    //========================================================================
+    //dnssec-validation auto;
+
+    allow-query { any; };
+    auth-nxdomain no;
+    listen-on-v6 { any; };
+};" > /etc/bind/named.conf.options
+
+```
+jangan lupa
+```
+service bind9 restart
+```
+Pada `DNS Slave`, kita harus mengarahkan zona ke `DNS Master` agar otoritasnya dapat berjalan. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Slave`.
+
+## Werkudara
+>>>>>>> 742581c286fb2666b1174144f4642181921ae691
 
 ```
 echo 'zone "baratayuda.abimanyu.b05.com" {
@@ -338,11 +399,21 @@ jangan lupa
 ```
 service bind9 restart
 ```
+<<<<<<< HEAD
 cek dengan
+=======
+Test
+>>>>>>> 742581c286fb2666b1174144f4642181921ae691
 ```
 ping baratayuda.abimanyu.b05.com -c 5
 ping www.baratayuda.abimanyu.b05.com -c 5
 ```
+<<<<<<< HEAD
+=======
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/8f78244f-ec8b-467b-bd68-06ea06ef287a)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/11724c24-c278-4be0-9609-6ce78fe2ecdd)
+
+>>>>>>> 742581c286fb2666b1174144f4642181921ae691
 # Question 8
 
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
@@ -377,11 +448,21 @@ jangan lupa
 ```
 service bind9 restart
 ```
+<<<<<<< HEAD
 cek dengan
 ```
 ping rjp.baratayuda.abimanyu.b05.com -c 5
 ping www.rjp.baratayuda.abimanyu.b05.com -c 5
 ```
+=======
+Test
+```
+# ping rjp.baratayuda.abimanyu.b05.com -c 5
+# ping www.rjp.baratayuda.abimanyu.b05.com -c 5
+```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/51815f17-c323-4dd9-b7ef-2c160f9ecf30)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/c39e7204-7da3-4cef-b90b-6be123a60c41)
+>>>>>>> 742581c286fb2666b1174144f4642181921ae691
 
 # Question 9
 
@@ -594,6 +675,8 @@ lynx http://arjuna.b05.com
 ```
 ![No9](Gambar/No9.png)
 
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/b6c6c579-8641-4168-8ef0-21d40ea7c114)
+
 # Question 10
 
 Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
@@ -611,8 +694,19 @@ upstream backend {
   server 10.11.3.4:8003; # IP Wisanggeni
 }
 ```
+Lakukan test berikut 
+```
+lynx http://10.11.3.2:8001
+lynx http://10.11.3.2:8002
+lynx http://10.11.3.2:8003
 
+<<<<<<< HEAD
 ## Prabukusuma
+=======
+```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/b6c6c579-8641-4168-8ef0-21d40ea7c114)
+## Prabukusuma, Abimanyu, dan Wisanggeni
+>>>>>>> 742581c286fb2666b1174144f4642181921ae691
 
 X merupakan port yang telah disesuaikan dengan setiap `worker` secara individual.
 
@@ -783,6 +877,7 @@ service apache2 restart
 lynx abimanyu.b05.com
 curl abimanyu.b05.com
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/4c01e53c-d2f2-47e6-ba46-5f1e25c0a27a)
 
 # Question 12
 
@@ -824,6 +919,7 @@ service apache2 restart
 lynx abimanyu.b05.com/home
 curl abimanyu.b05.com/home
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/90cf8122-62c2-4cf7-8bb1-8187dd80f4d8)
 
 # Question 13
 
@@ -855,6 +951,7 @@ service apache2 restart
 lynx parikesit.abimanyu.b05.com
 curl parikesit.abimanyu.b05.com
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/d5e15d84-f817-4d41-babe-fb31576498ce)
 
 # Question 14
 
@@ -895,6 +992,8 @@ service apache2 restart
 lynx parikesit.abimanyu.b05.com/public
 lynx parikesit.abimanyu.b05.com/secret
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/d50b7bac-1ed3-4ebe-bb81-a9f8f0aa1573)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/d0cb7de5-fa8d-450d-8391-2c230c4a92dc)
 
 # Question 15
 
@@ -937,6 +1036,8 @@ service apache2 restart
 lynx parikesit.abimanyu.b05.com/testerror
 lynx parikesit.abimanyu.b05.com/secret
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/4149cc18-f6ff-487c-b03b-b275bc200198)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/35eea9d1-e9bd-4f81-ad63-10c7fb87e6d3)
 
 # Question 16
 
@@ -982,6 +1083,8 @@ service apache2 restart
 ```
 lynx parikesit.abimanyu.b05.com/js
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/bb537776-edd5-4c8b-9a09-462c6fc1aa0f)
+
 # Question 17
 
 Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
@@ -1033,6 +1136,10 @@ service apache2 restart
 lynx rjp.baratayuda.abimanyu.b05.com:14000
 lynx rjp.baratayuda.abimanyu.b05.com:14400
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/99676b35-78b8-40a8-aaeb-9df826cd9c70)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/81df09a3-5c1b-4e3d-aac0-f5c0ecaf71a4)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/54af77d6-1925-4c07-a5ba-e221928ea6fb)
+
 # Question 18
 
 Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
@@ -1082,7 +1189,9 @@ htpasswd -c -b /etc/apache2/.htpasswd Wayang baratayudab05
 lynx rjp.baratayuda.abimanyu.b05.com:14000
 lynx rjp.baratayuda.abimanyu.b05.com:14400
 ```
-
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/99676b35-78b8-40a8-aaeb-9df826cd9c70)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/81df09a3-5c1b-4e3d-aac0-f5c0ecaf71a4)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/54af77d6-1925-4c07-a5ba-e221928ea6fb)
 # Question 19
 
 Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihkan ke www.abimanyu.yyy.com (alias)
@@ -1117,6 +1226,7 @@ apache2ctl configtest
 ```
 lynx 10.11.3.3
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/0e8c06ce-6758-4607-8d69-0f29d294a5f9)
 
 # Question 20
 
@@ -1190,3 +1300,7 @@ lynx parikesit.abimanyu.b05.com/public/images/abimanyu.png
 lynx parikesit.abimanyu.b05.com/public/images/notabimanyujustmuseum.177013
 
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/2eacbb22-2c2c-4d46-b6d6-718e2916ab71)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/6ed4b457-fc0d-49f1-97f3-0bf4f9845306)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/4bf7a0fd-cc40-453d-90cb-e050d92dab74)
+
