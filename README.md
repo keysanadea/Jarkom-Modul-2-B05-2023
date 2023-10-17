@@ -257,7 +257,7 @@ Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatl
 
 Sebelum mulai tugas ini, konfigurasi awal harus dilakukan. Delegasi subdomain memerlukan pengaturan pada DNS Master dan DNS Slave. Selain itu, perlu menggunakan `allow-query { any; };` pada `DNS Master` dan `Slave`. Selain itu, `NS` (Name Server) juga diperlukan karena `NS` digunakan dalam delegasi zona `DNS` untuk menggunakan authoritative name server yang telah ditentukan.
 
-Di DNS Master, kita harus memasukkan entri `ns1      IN       A     192.173.2.2     ; IP Werkudara` ini untuk mendapatkan otoritas atas Werkudara. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Master`.
+Di DNS Master, kita harus memasukkan entri `ns1      IN       A     10.11.2.2     ; IP Werkudara` ini untuk mendapatkan otoritas atas Werkudara. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Master`.
 
 ## Yudhistira
 ```
