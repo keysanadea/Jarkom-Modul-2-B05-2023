@@ -29,9 +29,9 @@ Melakukan setup berikut pada node DNS Master
 ```
 echo 'zone "arjuna.b05.com" {
         type master;
-        file "/etc/bind/jarkom/arjuna.b05.com";
         allow-transfer { 10.11.3.5; }; // IP Arjuna
-};' > /etc/bind9/named.conf.local
+        file "/etc/bind/jarkom/arjuna.b05.com";
+};' > /etc/bind/named.conf.local
 
 mkdir /etc/bind/jarkom
 
@@ -52,6 +52,7 @@ $TTL    604800
 @       IN      NS      arjuna.b05.com.
 @       IN      A       10.11.1.2     ; IP Yudhistira
 www     IN      CNAME   arjuna.b05.com.' > /etc/bind/jarkom/arjuna.b05.com
+
 ```
 kemudian lakukan
 ```
@@ -60,6 +61,7 @@ service bind9 restart
 cek dengan prompt berikut 
 ```
 host -t CNAME www.arjuna.b05.com
+ping arjuna.b05.com -c 5
 ping www.arjuna.b05.com -c 5
 ```
 
@@ -100,6 +102,7 @@ $TTL    604800
 @       IN      NS      abimanyu.b05.com.
 @       IN      A       10.11.1.2     ; IP Yudhistira
 www     IN      CNAME   abimanyu.b05.com.' > /etc/bind/jarkom/abimanyu.b05.com
+
 ```
 kemudian lakukan
 ```
@@ -107,7 +110,7 @@ service bind9 restart
 ```
 kemudian cek dengan
 ```
-host -t CNAME www.abimanyu.b05.com
+ping abimanyu.b05.com -c 5
 ping www.abimanyu.b05.com -c 5
 ```
 ![No3](Gambar/No3.png)
@@ -138,6 +141,7 @@ $TTL    604800
 @       IN      A       10.11.1.2     ; IP Yudhistira
 www     IN      CNAME   abimanyu.b05.com.
 parikesit IN    A       10.11.3.3     ; IP Abimanyu' > /etc/bind/jarkom/abimanyu.b05.com
+
 ```
 jangan lupa prompt berikut setelah save
 ```
@@ -148,6 +152,8 @@ cek dengan
 ping parikesit.abimanyu.b05.com -c 5
 ```
 
+![No4](Gambar/No4.png)
+
 # Question 5
 
 Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
@@ -155,15 +161,27 @@ Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 Agar dapat mengatur reverse domain, penting untuk mengetahui alamat IP Abimanyu. Dalam kasus ini, IP Abimanyu dari kelompok B05 adalah 10.11.3.3, dan langkah selanjutnya adalah mengonversinya menjadi 3.3.11.10.
 
 ```
-echo 'zone "3.11.10.in-addr.arpa" {
+echo 'zone "arjuna.b05.com" {
         type master;
-        file "/etc/bind/jarkom/3.11.10.in-addr.arpa";
+allow-transfer { 10.11.3.5; }; // IP Arjuna
+        file "/etc/bind/jarkom/arjuna.b05.com";
+ 
+};
+
+zone "abimanyu.b05.com" {
+        type master;
+ allow-transfer { 10.11.3.5; }; // IP Arjuna
+        file "/etc/bind/jarkom/abimanyu.b05.com";
+};
+
+zone "1.11.10.in-addr.arpa" {
+        type master;
+        file "/etc/bind/jarkom/1.11.10.in-addr.arpa";
 };' > /etc/bind/named.conf.local
 
-cp /etc/bind/db.local /etc/bind/jarkom/3.11.10.in-addr.arpa
+cp /etc/bind/db.local /etc/bind/jarkom/1.11.10.in-addr.arpa
 
-echo '
-;
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
@@ -174,19 +192,19 @@ $TTL    604800
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-3.11.10.in-addr.arpa.   IN      NS      abimanyu.b05.com.
-3                       IN      PTR     abimanyu.b05.com.
-5                       IN      PTR     arjuna.b05.com.' > /etc/bind/jarkom/3.11.10.in-addr.arpa
-```
+1.11.10.in-addr.arpa. IN      NS      abimanyu.b05.com.
+2                     IN      PTR     abimanyu.b05.com.' > /etc/bind/jarkom/1.11.10.in-addr.arpa
 
+```
 jangan lupa
 ```
 service bind9 restart
 ```
 jangan lupa juga kembalikan `nameserver`
 ```
-host -t PTR 10.11.3.3
+host -t PTR 10.11.1.2
 ```
+![No5](Gambar/No5.png)
 
 # Question 6
 
@@ -200,8 +218,10 @@ Di DNS Master, penting untuk mengatur `also-notify` dan `allow-transfer`` sehing
 ```
 echo 'zone "arjuna.b05.com" {
         type master;
-        file "/etc/bind/jarkom/arjuna.a09.com";
+        notify yes;
+        also-notify { 10.11.2.2; }; // IP Werkudara
         allow-transfer { 10.11.2.2; }; // IP Werkudara
+        file "/etc/bind/jarkom/arjuna.b05.com";
 };
 
 zone "abimanyu.b05.com" {
@@ -212,24 +232,11 @@ zone "abimanyu.b05.com" {
         file "/etc/bind/jarkom/abimanyu.b05.com";
 };
 
-zone "3.11.10.in-addr.arpa" {
+zone "1.11.10.in-addr.arpa" {
         type master;
-        file "/etc/bind/jarkom/3.11.10.in-addr.arpa";
+        file "/etc/bind/jarkom/1.11.10.in-addr.arpa";
 };' > /etc/bind/named.conf.local
-```
-Jangan lupa 
-```
-service bind9 restart
-service bind9 stop
-```
-## Werkudara sebagai DNS Slave
 
-```
-echo 'zone "abimanyu.b05.com" {
-    type slave;
-    masters { 10.11.1.2; }; // IP Yudhistira
-    file "/var/lib/bind/abimanyu.b05.com";
-};' >> /etc/bind/named.conf.local
 ```
 jangan lupa
 ```
@@ -263,12 +270,12 @@ $TTL    604800
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@       IN      NS      abimanyu.b05.com.
-@       IN      A       10.11.1.2     ; IP Yudhistira
-www     IN      CNAME   abimanyu.b05.com.
-parikesit IN    A       10.11.3.3     ; IP Abimanyu
-ns1     IN      A       10.11.2.2     ; IP Werkudara
-baratayuda IN   NS      ns1' > /etc/bind/jarkom/abimanyu.b05.com
+@            IN     NS      abimanyu.b05.com.
+@            IN     A       10.11.1.2     ; IP Yudhistira
+www          IN     CNAME   abimanyu.b05.com.
+parikesit    IN     A       10.11.3.3     ; IP Abimanyu
+ns1          IN     A       10.11.2.2     ; IP Werkudara
+baratayuda   IN     NS      ns1' > /etc/bind/jarkom/abimanyu.b05.com
 
 echo "options {
     directory \"/var/cache/bind\";
@@ -296,6 +303,7 @@ echo "options {
     auth-nxdomain no;
     listen-on-v6 { any; };
 };" > /etc/bind/named.conf.options
+
 ```
 jangan lupa
 ```
@@ -486,6 +494,7 @@ lynx http://10.11.3.4
 lynx http://10.11.3.5
 lynx http://arjuna.b05.com
 ```
+![No9](Gambar/No9.png)
 
 # Question 10
 
