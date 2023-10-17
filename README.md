@@ -9,12 +9,54 @@ Group Members:
    
 ### Question 1
 
-Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjuna merupakan Load Balancer yang terdiri dari beberapa Web Server yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Buatlah topologi dengan pembagian sebagai berikut. Folder topologi dapat diakses pada drive berikut 
+Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjuna merupakan Load Balancer yang terdiri dari beberapa Web Server yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Buatlah topologi dengan pembagian sebagai berikut. Folder topologi dapat diakses pada drive berikut (Topologi 1)
+
+![No1](Gambar/Topologi.png)
+
+Testing pada client Nakula dan Yudhistira
+# Nakula dan Y
+
+ping google.com -c 2
+```
+![No1](Gambar/Cuplikan%20layar%202023-10-17%20144716.png)
+![No2](Gambar/Cuplikan%20layar%202023-10-17%20144917.png)
 
 ### Question 2
 
 Buatlah website utama pada node arjuna dengan akses ke arjuna.yyy.com dengan alias www.arjuna.yyy.com dengan yyy merupakan kode kelompok.
 
+Melakukan setup berikut pada node DNS Master
+
+echo 'zone "arjuna.b05.com" {
+        type master;
+        file "/etc/bind/jarkom/arjuna.a09.com";
+        allow-transfer { 10.11.3.5; }; // IP Arjuna
+};' > /etc/bind9/named.conf.local
+
+mkdir /etc/bind/jarkom
+
+cp /etc/bind/db.local /etc/bind/jarkom/arjuna.b05.com
+
+echo '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     arjuna.b05.com. root.arjuna.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      arjuna.b05.com.
+@       IN      A       10.11.1.2     ; IP Yudhistira
+www     IN      CNAME   arjuna.b05.com.' > /etc/bind/jarkom/arjuna.b05.com
+
+kemudian lakukan
+
+service bind9 restart
+```
 ### Question 3
 
 Dengan cara yang sama seperti soal nomor 2, buatlah website utama dengan akses ke abimanyu.yyy.com dan alias www.abimanyu.yyy.com.
