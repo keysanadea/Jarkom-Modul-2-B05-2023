@@ -744,7 +744,8 @@ lynx parikesit.abimanyu.b05.com/secret
 Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi 
 www.parikesit.abimanyu.yyy.com/js 
 
-Di sini, langkah yang perlu diambil adalah mengggunakan `Alias "/js" "/var/www/parikesit.abimanyu.b09/public/js"` guna membuat alamat virtual host lebih singkat. Selain itu, kami menggunakan `ServerName` dan `ServerAlias` untuk memastikan agar virtual host berjalan dengan baik.
+Di sini, langkah yang perlu diambil adalah mengggunakan 
+`Alias "/js" "/var/www/parikesit.abimanyu.b09/public/js"` guna membuat alamat virtual host lebih singkat. Selain itu, kami menggunakan `ServerName` dan `ServerAlias` untuk memastikan agar virtual host berjalan dengan baik.
 
 ## Abimanyu
 
@@ -782,14 +783,192 @@ lynx parikesit.abimanyu.b05.com/js
 
 Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
 
+Untuk menyesuaikan port tertentu, langkah yang diperlukan adalah mengedit file `ports.conf` dengan menambahkan perintah `Listen 14000` dan `Listen 14400`. Selanjutnya, kita juga perlu mengubah bagian `<VirtualHost *:14000 *:14400>`.
+
+## Abimanyu
+
+```
+echo -e '<VirtualHost *:14000 *:14400>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/rjp.baratayuda.abimanyu.b05
+  ServerName rjp.baratayuda.abimanyu.b05.com
+  ServerAlias www.rjp.baratayuda.abimanyu.b05.com
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/rjp.baratayuda.abimanyu.b05.com.conf
+
+echo -e '# If you just change the port or add more ports here, you will likely also
+# have to change the VirtualHost statement in
+# /etc/apache2/sites-enabled/000-default.conf
+
+Listen 80
+Listen 14000
+Listen 14400
+
+<IfModule ssl_module>
+        Listen 443
+</IfModule>
+
+<IfModule mod_gnutls.c>
+        Listen 443
+</IfModule>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet' > /etc/apache2/ports.conf
+
+a2ensite rjp.baratayuda.abimanyu.b05.com.conf
+```
+jangan lupa
+```
+service apache2 restart
+```
+## Client
+```
+lynx rjp.baratayuda.abimanyu.b05.com:14000
+lynx rjp.baratayuda.abimanyu.b05.com:14400
+```
 # Question 18
 
 Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
+
+Untuk mengimplementasikan autentikasi pada server, dibutuhkan pengaturan seperti `AuthType` dan `Require Valid-User`. `AuthUserFile` digunakan untuk menentukan lokasi penyimpanan informasi autentikasi yang dapat ditulis. Sementara `AuthName` mengacu pada jenis autentikasi yang digunakan dalam konfigurasi `Apache2`.
+
+## Abimanyu
+
+```
+echo -e '<VirtualHost *:14000 *:14400>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/rjp.baratayuda.abimanyu.b05
+  ServerName rjp.baratayuda.abimanyu.b05.com
+  ServerAlias www.rjp.baratayuda.abimanyu.b05.com
+
+  <Directory /var/www/rjp.baratayuda.abimanyu.b05>
+          AuthType Basic
+          AuthName "Restricted Content"
+          AuthUserFile /etc/apache2/.htpasswd
+          Require valid-user
+  </Directory>
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/rjp.baratayuda.abimanyu.b05.com.conf
+
+a2ensite rjp.baratayuda.abimanyu.b05.com.conf
+```
+jangan lupa
+```
+service apache2 restart
+```
+Sisipkan proses autentikasi dengan menggunakan perintah `htpasswd`. Penggunaan `-c` mengindikasikan `created` file dan -b merupakan `bcrypt` supaya password yang dimasukkan akan di-hash terlebih dahulu sebelum disimpan.
+
+```
+htpasswd -c -b /etc/apache2/.htpasswd Wayang baratayudab05
+```
+
+## Client
+```
+lynx rjp.baratayuda.abimanyu.b05.com:14000
+lynx rjp.baratayuda.abimanyu.b05.com:14400
+```
 
 # Question 19
 
 Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihkan ke www.abimanyu.yyy.com (alias)
 
+Untuk mengalihkan otomatis saat mengakses IP dari Abimanyu ke www.abimanyu.b05.com, kami menggunakan file `Redirect` yang mengarahkan ke lokasi yang diinginkan. Langkah ini diimplementasikan dalam file konfigurasi `000-default.conf` karena berkas tersebut adalah konfigurasi default dari Apache.
+
+## Abimanyu
+
+```
+echo -e '<VirtualHost *:80>
+    ServerAdmin webmaster@abimanyu.b05.com
+    DocumentRoot /var/www/html
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    Redirect / http://www.abimanyu.b05.com/
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+```
+Testing
+```
+apache2ctl configtest
+service apache2 restart
+```
+## Client
+
+```
+lynx 10.11.3.3
+```
+
 # Question 20
 
 Karena website www.parikesit.abimanyu.yyy.com semakin banyak pengunjung dan banyak gambar gambar random, maka ubahlah request gambar yang memiliki substring “abimanyu” akan diarahkan menuju abimanyu.png.
+
+## Abimanyu
+ run `rewrite modul`
+ 
+ ```
+ a2enmod rewrite
+ ```
+
+untuk melakukan `rewrite` terhadap directory `parikesit.abimanyu.b05`
+
+```
+echo 'RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/public/images/(.*)(abimanyu)(.*\.(png|jpg))
+RewriteCond %{REQUEST_URI} !/public/images/abimanyu.png
+RewriteRule abimanyu http://parikesit.abimanyu.b05.com/public/images/abimanyu.png$1 [L,R=301]' > /var/www/parikesit.abimanyu.b05/.htaccess
+```
+ubah config dan pakai `AllowOverride All` untuk mengkonfigurasi `.httaccess`.
+
+```
+echo -e '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/parikesit.abimanyu.b05
+
+  ServerName parikesit.abimanyu.b05.com
+  ServerAlias www.parikesit.abimanyu.b05.com
+
+  <Directory /var/www/parikesit.abimanyu.b05/public>
+          Options +Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.b05/secret>
+          Options -Indexes
+  </Directory>
+
+  <Directory /var/www/parikesit.abimanyu.b05>
+          Options +FollowSymLinks -Multiviews
+          AllowOverride All
+  </Directory>
+
+  Alias "/public" "/var/www/parikesit.abimanyu.b05/public"
+  Alias "/secret" "/var/www/parikesit.abimanyu.b05/secret"
+  Alias "/js" "/var/www/parikesit.abimanyu.b05/public/js"
+
+  ErrorDocument 404 /error/404.html
+  ErrorDocument 403 /error/403.html
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
+```
+jangan lupa
+```
+service apache2 restart
+```
+## Client
+
+```
+lynx parikesit.abimanyu.b05.com/public/images/not-abimanyu.png
+lynx parikesit.abimanyu.b05.com/public/images/abimanyu-student.jpg
+lynx parikesit.abimanyu.b05.com/public/images/abimanyu.png
+lynx parikesit.abimanyu.b05.com/public/images/notabimanyujustmuseum.177013
+```
