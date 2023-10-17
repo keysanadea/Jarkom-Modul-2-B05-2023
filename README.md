@@ -6,6 +6,198 @@ Group Members:
 | ------ | ------ |
 |5025211028|Keysa Anadea Aqiva Ajie|
 |5025221202|Hilmy Septian Nursyekha|
+
+# Starterpack Praktikum
+
+## PANDUDEWANATA
+```
+auto eth0
+iface eth0 inet dhcp
+auto eth1
+iface eth1 inet static
+        address 10.11.1.1
+        netmask 255.255.255.0
+
+auto eth2
+iface eth2 inet static
+        address 10.11.2.1
+        netmask 255.255.255.0
+
+auto eth3
+iface eth3 inet static
+        address 10.11.3.1
+        netmask 255.255.255.0
+```
+
+## YUDHISTIRA
+```
+auto eth0
+iface eth0 inet static
+        address 10.11.1.2
+        netmask 255.255.255.0
+        gateway 10.11.1.1
+```
+## NAKULA
+
+```
+auto eth0
+iface eth0 inet static
+        address 10.11.1.3
+        netmask 255.255.255.0
+        gateway 10.11.1.1
+```
+
+## WERKUDARA
+
+```auto eth0
+iface eth0 inet static
+        address 10.11.2.2
+        netmask 255.255.255.0
+        gateway 10.11.2.1
+```
+## SADEWA
+
+```auto eth0
+iface eth0 inet static
+        address 10.11.2.3
+        netmask 255.255.255.0
+        gateway 10.11.2.1
+```
+
+## PRABUKUSUMA
+
+```
+auto eth0
+iface eth0 inet static
+        address 10.11.3.2
+        netmask 255.255.255.0
+        gateway 10.11.3.1
+ ```
+
+## ABIMANYU
+
+```
+auto eth0
+iface eth0 inet static
+        address 10.11.3.3
+        netmask 255.255.255.0
+        gateway 10.11.3.1
+```
+## WISANGGENI
+
+```
+auto eth0
+iface eth0 inet static
+        address 10.11.3.4
+        netmask 255.255.255.0
+        gateway 10.11.3.1
+```
+
+## ARJUNA
+
+```
+auto eth0
+iface eth0 inet static
+        address 10.11.3.5
+        netmask 255.255.255.0
+        gateway 10.11.3.1
+```
+
+# DNS
+
+## PANDUDEWANATA
+
+```
+apt-get update
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 10.11.0.0/16
+echo nameserver 192.168.122.1 > /etc/resolv.conf
+```
+
+## NAKULA
+
+```
+echo -e '
+nameserver 192.168.122.1
+nameserver 10.11.1.2 # IP Yudhistira
+nameserver 10.11.2.2 # IP Werkudara
+' > /etc/resolv.conf
+apt-get update
+apt-get install dnsutils -y
+apt-get install lynx -y
+```
+
+## SADEWA
+
+```
+echo -e '
+nameserver 192.168.122.1
+nameserver 10.11.1.2 # IP Yudhistira
+nameserver 10.11.2.2 # IP Werkudara
+' > /etc/resolv.conf
+apt-get update
+apt-get install dnsutils -y
+apt-get install lynx -y
+```
+
+## PRABUKUSUMA
+
+```
+echo -e '
+nameserver 192.168.122.1
+nameserver 10.11.1.2 # IP Yudhistira
+nameserver 10.11.2.2 # IP Werkudara
+' > /etc/resolv.conf
+apt-get update
+apt-get install dnsutils -y
+apt-get install lynx -y
+```
+
+## ABIMANYU
+
+```
+echo -e '
+nameserver 192.168.122.1
+nameserver 10.11.1.2 # IP Yudhistira
+nameserver 10.11.2.2 # IP Werkudara
+' > /etc/resolv.conf
+apt-get update
+apt-get install dnsutils -y
+apt-get install lynx -y
+```
+
+## WISANGGENI
+
+```
+echo -e '
+nameserver 192.168.122.1
+nameserver 10.11.1.2 # IP Yudhistira
+nameserver 10.11.2.2 # IP Werkudara
+' > /etc/resolv.conf
+apt-get update
+apt-get install dnsutils -y
+apt-get install lynx -y
+```
+
+## ARJUNA
+
+```
+echo -e '
+nameserver 192.168.122.1
+nameserver 10.11.1.2 # IP Yudhistira
+nameserver 10.11.2.2 # IP Werkudara
+' > /etc/resolv.conf
+apt-get update
+apt-get install dnsutils -y
+apt-get install lynx -y
+```
+
+## YUDHISTIRA
+
+```
+echo 'nameserver 192.168.122.1' > /etc/resolv.conf
+apt-get update
+apt-get install bind9 -y
+```
    
 # Question 1
 
