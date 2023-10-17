@@ -57,6 +57,13 @@ kemudian lakukan
 ```
 service bind9 restart
 ```
+cek dengan prompt berikut 
+```
+ping www.arjuna.b05.com -c 5
+```
+
+![No2](Gambar/No%202.png)
+
 ### Question 3
 
 Dengan cara yang sama seperti soal nomor 2, buatlah website utama dengan akses ke abimanyu.yyy.com dan alias www.abimanyu.yyy.com.
