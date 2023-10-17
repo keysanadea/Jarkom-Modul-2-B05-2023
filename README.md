@@ -152,13 +152,212 @@ ping parikesit.abimanyu.b05.com -c 5
 
 Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 
+Agar dapat mengatur reverse domain, penting untuk mengetahui alamat IP Abimanyu. Dalam kasus ini, IP Abimanyu dari kelompok B05 adalah 10.11.3.3, dan langkah selanjutnya adalah mengonversinya menjadi 3.3.11.10.
+
+```
+echo 'zone "3.11.10.in-addr.arpa" {
+        type master;
+        file "/etc/bind/jarkom/3.11.10.in-addr.arpa";
+};' > /etc/bind/named.conf.local
+
+cp /etc/bind/db.local /etc/bind/jarkom/3.11.10.in-addr.arpa
+
+echo '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.b05.com. root.abimanyu.b05.com. (
+                        2003101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+3.11.10.in-addr.arpa.   IN      NS      abimanyu.b05.com.
+3                       IN      PTR     abimanyu.b05.com.
+5                       IN      PTR     arjuna.b05.com.' > /etc/bind/jarkom/3.11.10.in-addr.arpa
+```
+
+jangan lupa
+```
+service bind9 restart
+```
+
 ### Question 6
 
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
 
+
+Untuk menjalankan tugas DNS Slave, diperlukan beberapa pengaturan pada DNS Master dan juga pada DNS Slave (Werkudara)
+
+Di DNS Master, penting untuk mengatur `also-notify` dan `allow-transfer`` sehingga memberikan otorisasi kepada alamat IP yang dituju.
+
+```
+echo 'zone "arjuna.b05.com" {
+        type master;
+        file "/etc/bind/jarkom/arjuna.a09.com";
+        allow-transfer { 10.11.2.2; }; // IP Werkudara
+};
+
+zone "abimanyu.b05.com" {
+        type master;
+        notify yes;
+        also-notify { 10.11.2.2; }; // IP Werkudara
+        allow-transfer { 10.11.2.2; }; // IP Werkudara
+        file "/etc/bind/jarkom/abimanyu.b05.com";
+};
+
+zone "3.11.10.in-addr.arpa" {
+        type master;
+        file "/etc/bind/jarkom/3.11.10.in-addr.arpa";
+};' > /etc/bind/named.conf.local
+```
+Jangan lupa 
+```
+service bind9 restart
+service bind9 stop
+```
+# Werkudara sebagai DNS Slave
+
+```
+echo 'zone "abimanyu.b05.com" {
+    type slave;
+    masters { 10.11.1.2; }; // IP Yudhistira
+    file "/var/lib/bind/abimanyu.b05.com";
+};' >> /etc/bind/named.conf.local
+```
+jangan lupa
+```
+service bind9 restart
+```
+kemudian cek dengan
+```
+ping abimanyu.b05.com -c 5
+ping www.abimanyu.b05.com -c 5
+```
+
 ### Question 7
 
 Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatlah subdomain khusus untuk perang yaitu baratayuda.abimanyu.yyy.com dengan alias www.baratayuda.abimanyu.yyy.com yang didelegasikan dari Yudhistira ke Werkudara dengan IP menuju ke Abimanyu dalam folder Baratayuda.
+
+
+Sebelum mulai tugas ini, konfigurasi awal harus dilakukan. Delegasi subdomain memerlukan pengaturan pada DNS Master dan DNS Slave. Selain itu, perlu menggunakan `allow-query { any; };` pada `DNS Master` dan `Slave`. Selain itu, `NS` (Name Server) juga diperlukan karena `NS` digunakan dalam delegasi zona `DNS` untuk menggunakan authoritative name server yang telah ditentukan.
+
+Di DNS Master, kita harus memasukkan entri `ns1      IN       A     192.173.2.2     ; IP Werkudara` ini untuk mendapatkan otoritas atas Werkudara. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Master`.
+
+# Yudhistira
+```
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.b05.com. root.abimanyu.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.b05.com.
+@       IN      A       10.11.1.2     ; IP Yudhistira
+www     IN      CNAME   abimanyu.b05.com.
+parikesit IN    A       10.11.3.3     ; IP Abimanyu
+ns1     IN      A       10.11.2.2     ; IP Werkudara
+baratayuda IN   NS      ns1' > /etc/bind/jarkom/abimanyu.b05.com
+
+echo "options {
+    directory \"/var/cache/bind\";
+
+    // If there is a firewall between you and nameservers you want
+    // to talk to, you may need to fix the firewall to allow multiple
+    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+    // If your ISP provided one or more IP addresses for stable
+    // nameservers, you probably want to use them as forwarders.
+    // Uncomment the following block, and insert the addresses replacing
+    // the all-0's placeholder.
+
+    // forwarders {
+    //      0.0.0.0;
+    // };
+
+    //========================================================================
+    // If BIND logs error messages about the root key being expired,
+    // you will need to update your keys.  See https://www.isc.org/bind-keys
+    //========================================================================
+    //dnssec-validation auto;
+
+    allow-query { any; };
+    auth-nxdomain no;
+    listen-on-v6 { any; };
+};" > /etc/bind/named.conf.options
+```
+jangan lupa
+```
+service bind9 restart
+```
+Pada `DNS Slave`, kita harus mengarahkan zona ke `DNS Master` agar otoritasnya dapat berjalan. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Slave`.
+
+# Werkudara
+
+```
+echo 'zone "baratayuda.abimanyu.b05.com" {
+        type master;
+        file "/etc/bind/baratayuda/baratayuda.abimanyu.b05.com";
+};' >> /etc/bind/named.conf.local
+
+mkdir /etc/bind/baratayuda
+
+cp /etc/bind/db.local /etc/bind/baratayuda/baratayuda.abimanyu.b05.com
+
+echo '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     baratayuda.abimanyu.b05.com. root.baratayuda.abimanyu.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      baratayuda.abimanyu.b05.com.
+@       IN      A       10.11.3.3     ; IP Abimanyu
+www     IN      CNAME   baratayuda.abimanyu.b05.com.' > /etc/bind/baratayuda/baratayuda.abimanyu.b05.com
+
+echo "options {
+    directory \"/var/cache/bind\";
+
+    // If there is a firewall between you and nameservers you want
+    // to talk to, you may need to fix the firewall to allow multiple
+    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+
+    // If your ISP provided one or more IP addresses for stable
+    // nameservers, you probably want to use them as forwarders.
+    // Uncomment the following block, and insert the addresses replacing
+    // the all-0's placeholder.
+
+    // forwarders {
+    //      0.0.0.0;
+    // };
+
+    //========================================================================
+    // If BIND logs error messages about the root key being expired,
+    // you will need to update your keys.  See https://www.isc.org/bind-keys
+    //========================================================================
+    //dnssec-validation auto;
+
+    allow-query { any; };
+    auth-nxdomain no;
+    listen-on-v6 { any; };
+};" > /etc/bind/named.conf.options
+```
+jangan lupa
+```
+service bind9 restart
+```
 
 ### Question 8
 
