@@ -14,8 +14,8 @@ Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjun
 ![No1](Gambar/Topologi.png)
 
 Testing pada client Nakula dan Yudhistira
-# Nakula dan Y
-
+#Nakula dan Yudhistira
+``````
 ping google.com -c 2
 ```
 ![No1](Gambar/Cuplikan%20layar%202023-10-17%20144716.png)
@@ -26,7 +26,7 @@ ping google.com -c 2
 Buatlah website utama pada node arjuna dengan akses ke arjuna.yyy.com dengan alias www.arjuna.yyy.com dengan yyy merupakan kode kelompok.
 
 Melakukan setup berikut pada node DNS Master
-
+```
 echo 'zone "arjuna.b05.com" {
         type master;
         file "/etc/bind/jarkom/arjuna.a09.com";
@@ -52,9 +52,9 @@ $TTL    604800
 @       IN      NS      arjuna.b05.com.
 @       IN      A       10.11.1.2     ; IP Yudhistira
 www     IN      CNAME   arjuna.b05.com.' > /etc/bind/jarkom/arjuna.b05.com
-
+```
 kemudian lakukan
-
+```
 service bind9 restart
 ```
 ### Question 3
