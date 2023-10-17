@@ -15,7 +15,7 @@ Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjun
 
 Testing pada client Nakula dan Yudhistira
 #Nakula dan Yudhistira
-``````
+```
 ping google.com -c 2
 ```
 ![No1](Gambar/Cuplikan%20layar%202023-10-17%20144716.png)
