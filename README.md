@@ -967,8 +967,7 @@ service apache2 restart
 ## Client
 
 ```
-lynx parikesit.abimanyu.b05.com/public/images/not-abimanyu.png
-lynx parikesit.abimanyu.b05.com/public/images/abimanyu-student.jpg
+lynx parikesit.abimanyu.b05.com/public/images/notis-abimanyu.png
+lynx parikesit.abimanyu.b05.com/public/images/abimanyu-loveee.jpg
 lynx parikesit.abimanyu.b05.com/public/images/abimanyu.png
-lynx parikesit.abimanyu.b05.com/public/images/notabimanyujustmuseum.177013
 ```
