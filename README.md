@@ -464,12 +464,6 @@ restart
 ```
 service nginx restart
 ```
-Test
-```
-ping rjp.baratayuda.abimanyu.b05.com -c 5
-ping www.rjp.baratayuda.abimanyu.b05.com -c 5
-
-```
 
 ## Abimanyu, Wisanggeni, dan Prabukusuma
 run `shell` pada masing-masing
@@ -518,6 +512,8 @@ lynx http://arjuna.b05.com
 ```
 ![No9](Gambar/No9.png)
 
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/b6c6c579-8641-4168-8ef0-21d40ea7c114)
+
 # Question 10
 
 Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
@@ -535,7 +531,14 @@ upstream backend {
   server 10.11.3.4:8003; # IP Wisanggeni
 }
 ```
+Lakukan test berikut 
+```
+lynx http://10.11.3.2:8001
+lynx http://10.11.3.2:8002
+lynx http://10.11.3.2:8003
 
+```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/b6c6c579-8641-4168-8ef0-21d40ea7c114)
 ## Prabukusuma, Abimanyu, dan Wisanggeni
 
 X merupakan port yang telah disesuaikan dengan setiap `worker` secara individual.
