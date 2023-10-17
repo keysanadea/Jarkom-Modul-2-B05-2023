@@ -183,6 +183,10 @@ jangan lupa
 ```
 service bind9 restart
 ```
+jangan lupa juga kembalikan `nameserver`
+```
+host -t PTR 10.11.3.3
+```
 
 ### Question 6
 
@@ -363,24 +367,270 @@ service bind9 restart
 
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
 
+Karena sebelumnya telah dilakukan delegasi ke `DNS Slave` dan sekarang diberikan perintah untuk membuat subdomain dalam delegasi domain tersebut, langkah selanjutnya adalah melakukan penambahan pada `DNS` Slave seperti berikut.
+```
+rjp             IN      A       10.11.3.3     ; IP Abimanyu
+www.rjp         IN      CNAME   rjp.baratayuda.abimanyu.b05.com.
+```
+
+# Werkudara
+
+```
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     baratayuda.abimanyu.b05.com. root.baratayuda.abimanyu.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@               IN      NS      baratayuda.abimanyu.b05.com.
+@               IN      A       10.11.3.3     ; IP Abimanyu
+www             IN      CNAME   baratayuda.abimanyu.b05.com.
+rjp             IN      A       10.11.3.3     ; IP Abimanyu
+www.rjp         IN      CNAME   rjp.baratayuda.abimanyu.b05.com.' > /etc/bind/baratayuda/baratayuda.abimanyu.b05.com
+```
+jangan lupa
+```
+service bind9 restart
+```
+
 ### Question 9
 
 Arjuna merupakan suatu Load Balancer Nginx dengan tiga worker (yang juga menggunakan nginx sebagai webserver) yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Lakukan deployment pada masing-masing worker.
 
+Untuk menjalankan load balancing, beberapa pengaturan pada `Arjuna` diperlukan.
+
+Pertama-tama, pastikan bahwa `Arjuna` sudah dikonfigurasi dengan benar, termasuk konfigurasi `Nginx` dan aturan load balancing. Kita harus memilih algoritma load balancing yang cocok dengan kebutuhan, seperti round-robin atau algoritma lainnya.
+
+Kemudian, lakukan proses deployment pada setiap worker. Ini melibatkan mengunggah aplikasi atau layanan web yang ingin diload balance ke setiap worker. Pastikan bahwa semua worker sudah diatur dengan benar dan siap untuk melayani lalu lintas web.
+
+Setelah semua tahap konfigurasi dan deployment selesai, `Arjuna` akan berperan sebagai load balancer yang akan mendistribusikan lalu lintas web ke worker yang tersedia.
+
+# Arjuna
+```
+echo 'upstream backend {
+  server 10.11.3.2; # IP Prabukusuma
+  server 10.11.3.3; # IP Abimanyu
+  server 10.11.3.4; # IP Wisanggeni
+}
+
+server {
+  listen 80;
+  server_name arjuna.b05.com www.arjuna.b05.com;
+
+  location / {
+    proxy_pass http://backend;
+  }
+}
+' > /etc/nginx/sites-available/jarkom
+```
+lakukan `symlink` dengan command
+```
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+```
+Untuk menghindari konflik port dengan pengaturan default yang ada saat menginstal `nginx`, diperlukan penghapusan file `default` tersebut.
+```
+rm /etc/nginx/sites-enabled/default
+```
+restart
+```
+service nginx restart
+```
+
+# Abimanyu, Wisanggeni, dan Prabukusuma
+run `shell` pada masing-masing
+```
+service php7.0-fpm start
+
+echo 'server {
+        listen 80;
+
+        root /var/www/jarkom;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}' > /etc/nginx/sites-available/jarkom
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+
+rm /etc/nginx/sites-enabled/default
+```
+jangan lupa
+```
+service nginx restart
+```
+# Client Nakula
+
+Lakukan test berikut 
+```
+lynx http://10.11.3.2
+lynx http://10.11.3.3
+lynx http://10.11.3.4
+lynx http://10.11.3.5
+lynx http://arjuna.b05.com
+```
+
 ### Question 10
 
 Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
-    - Prabakusuma:8001
+    - Prabukusuma:8001
     - Abimanyu:8002
     - Wisanggeni:8003
+
+Setelah berhasil menyelesaikan langkah ke-9 dalam proses deployment, langkah selanjutnya adalah melakukan penyesuaian pada port masing-masing worker agar sesuai dengan port yang telah ditentukan, yaitu `Prabukusuma:8001, Abimanyu:8002, dan Wisanggeni:8003`. Selain itu, diperlukan perubahan pada konfigurasi port `load-balancing` dengan menambahkan `:800X` pada setiap server.
+
+# Arjuna (Load Balancing)
+```
+upstream backend {
+  server 10.11.3.2:8001; # IP Prabukusuma
+  server 10.11.3.3:8002; # IP Abimanyu
+  server 10.11.3.4:8003; # IP Wisanggeni
+}
+```
+
+# Prabukusuma, Abimanyu, dan Wisanggeni
+
+X merupakan port yang telah disesuaikan dengan setiap `worker` secara individual.
+
+```
+echo 'server {
+        listen 800X;
+
+        root /var/www/jarkom;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}' > /etc/nginx/sites-available/jarkom
+```
 
 ### Question 11
 
 Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abimanyu dengan web server www.abimanyu.yyy.com. Pertama dibutuhkan web server dengan DocumentRoot pada /var/www/abimanyu.yyy
 
+Untuk menyelesaikan tugas ini, diperlukan beberapa pengaturan. Salah satunya adalah yang berkaitan dengan konfigurasi `Yudhistira`, di mana kita akan mengalihkan alamat IP yang sebelumnya ditujukan ke `Werkudara` agar sekarang menuju `Abimanyu`. Selain itu, diperlukan penggunaan `ServerAlias` agar memungkinkan penggunaan www di masa yang akan datang.
+
+# Yudhistira
+```
+# 11
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.b05.com. root.abimanyu.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.b05.com.
+@       IN      A       10.11.3.3     ; IP Abimanyu
+www     IN      CNAME   abimanyu.b05.com.
+parikesit IN    A       10.11.3.3     ; IP Abimanyu
+ns1     IN      A       10.11.2.2     ; IP Werkudara
+baratayuda IN   NS      ns1' > /etc/bind/jarkom/abimanyu.b05.com
+```
+jangan lupa
+```
+service bind9 restart
+```
+# Abimanyu
+```
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abimanyu.b05.com.conf
+
+rm /etc/apache2/sites-available/000-default.conf
+
+echo -e '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/abimanyu.b05
+
+  ServerName abimanyu.b05.com
+  ServerAlias www.abimanyu.b05.com
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/abimanyu.b05.com.conf
+
+a2ensite abimanyu.b05.com.conf
+```
+jangan lupa
+```
+service apache2 restart
+```
+# Cek pada Client
+```
+lynx abimanyu.b05.com
+```
+
 ### Question 12
 
 Setelah itu ubahlah agar url www.abimanyu.yyy.com/index.php/home menjadi www.abimanyu.yyy.com/home.
+
+Di sini, kita memanfaatkan `Directory` yang akan melakukan pengubahan (rewrite) terhadap Indexes. Hal ini dilakukan untuk memungkinkan penggunaan `Alias`.
+```
+<Directory /var/www/abimanyu.b05/index.php/home>
+  Options +Indexes
+</Directory>
+
+Alias "/home" "/var/www/abimanyu.b05/index.php/home"
+```
+# Abimanyu
+```
+echo -e '<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/abimanyu.b05
+  ServerName abimanyu.b05.com
+  ServerAlias www.abimanyu.b05.com
+
+  <Directory /var/www/abimanyu.b05/index.php/home>
+          Options +Indexes
+  </Directory>
+
+  Alias "/home" "/var/www/abimanyu.b05/index.php/home"
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>' > /etc/apache2/sites-available/abimanyu.b05.com.conf
+```
+jangan lupa
+```
+service apache2 restart
+```
+# Client
+```
+lynx abimanyu.a09.com/home
+curl abimanyu.a09.com/home
+```
 
 ### Question 13
 
