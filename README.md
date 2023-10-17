@@ -14,7 +14,7 @@ Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjun
 ![No1](Gambar/Topologi.png)
 
 Testing pada client Nakula dan Yudhistira
-#Nakula dan Yudhistira
+
 ```
 ping google.com -c 2
 ```
@@ -29,7 +29,7 @@ Melakukan setup berikut pada node DNS Master
 ```
 echo 'zone "arjuna.b05.com" {
         type master;
-        file "/etc/bind/jarkom/arjuna.a09.com";
+        file "/etc/bind/jarkom/arjuna.b05.com";
         allow-transfer { 10.11.3.5; }; // IP Arjuna
 };' > /etc/bind9/named.conf.local
 
@@ -59,14 +59,58 @@ service bind9 restart
 ```
 cek dengan prompt berikut 
 ```
+host -t CNAME www.arjuna.b05.com
 ping www.arjuna.b05.com -c 5
 ```
 
-![No2](Gambar/No%202.png)
+![No2](Gambar/No2.png)
 
 ### Question 3
 
 Dengan cara yang sama seperti soal nomor 2, buatlah website utama dengan akses ke abimanyu.yyy.com dan alias www.abimanyu.yyy.com.
+
+Melakukan setup berikut pada node DNS Master
+```
+echo 'zone "arjuna.b05.com" {
+        type master;
+        file "/etc/bind/jarkom/arjuna.b05.com";
+        allow-transfer { 10.11.3.5; }; // IP Arjuna
+};
+
+zone "abimanyu.b05.com" {
+        type master;
+        file "/etc/bind/jarkom/abimanyu.b05.com";
+        allow-transfer { 10.11.3.5; }; // IP Arjuna
+};' > /etc/bind/named.conf.local
+
+cp /etc/bind/db.local /etc/bind/jarkom/abimanyu.b05.com
+
+echo '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.b05.com. root.abimanyu.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.b05.com.
+@       IN      A       10.11.1.2     ; IP Yudhistira
+www     IN      CNAME   abimanyu.b05.com.' > /etc/bind/jarkom/abimanyu.b05.com
+```
+kemudian lakukan
+```
+service bind9 restart
+```
+kemudian cek dengan
+```
+host -t CNAME www.abimanyu.b05.com
+ping www.abimanyu.b05.com -c 5
+```
+![No3](Gambar/No3.png)
 
 ### Question 4
 
