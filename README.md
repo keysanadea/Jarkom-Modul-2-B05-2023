@@ -600,6 +600,7 @@ service apache2 restart
 ```
 lynx abimanyu.b05.com
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/4c01e53c-d2f2-47e6-ba46-5f1e25c0a27a)
 
 # Question 12
 
@@ -640,6 +641,7 @@ service apache2 restart
 lynx abimanyu.a09.com/home
 curl abimanyu.a09.com/home
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/90cf8122-62c2-4cf7-8bb1-8187dd80f4d8)
 
 # Question 13
 
@@ -671,6 +673,7 @@ service apache2 restart
 lynx parikesit.abimanyu.b05.com
 curl parikesit.abimanyu.b05.com
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/d5e15d84-f817-4d41-babe-fb31576498ce)
 
 # Question 14
 
