@@ -160,6 +160,7 @@ Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 
 Agar dapat mengatur reverse domain, penting untuk mengetahui alamat IP Abimanyu. Dalam kasus ini, IP Abimanyu dari kelompok B05 adalah 10.11.3.3, dan langkah selanjutnya adalah mengonversinya menjadi 3.3.11.10.
 
+## Yudhistira
 ```
 echo 'zone "arjuna.b05.com" {
         type master;
@@ -200,6 +201,7 @@ jangan lupa
 ```
 service bind9 restart
 ```
+## Client Abimanyu
 jangan lupa juga kembalikan `nameserver`
 ```
 host -t PTR 10.11.1.2
@@ -215,6 +217,7 @@ Untuk menjalankan tugas DNS Slave, diperlukan beberapa pengaturan pada DNS Maste
 
 Di DNS Master, penting untuk mengatur `also-notify` dan `allow-transfer`` sehingga memberikan otorisasi kepada alamat IP yang dituju.
 
+## Yudhistira
 ```
 echo 'zone "arjuna.b05.com" {
         type master;
@@ -241,6 +244,27 @@ zone "1.11.10.in-addr.arpa" {
 jangan lupa
 ```
 service bind9 restart
+service bind 9 stop
+```
+## Werkudara
+
+```
+echo 'zone "arjuna.b05.com" {
+    type slave;
+    masters { 10.11.1.2; }; // Masukan IP Yudhistira
+    file "/var/lib/bind/arjuna.b05.com";
+};' >> /etc/bind/named.conf.local
+
+echo 'zone "abimanyu.b05.com" {
+    type slave;
+    masters { 10.11.1.2; }; // Masukan IP Yudhistira
+    file "/var/lib/bind/abimanyu.b05.com";
+};' >> /etc/bind/named.conf.local
+
+jangan lupa
+```
+service bind9 restart
+```
 ```
 kemudian cek dengan
 ```
@@ -255,63 +279,7 @@ Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatl
 
 Sebelum mulai tugas ini, konfigurasi awal harus dilakukan. Delegasi subdomain memerlukan pengaturan pada DNS Master dan DNS Slave. Selain itu, perlu menggunakan `allow-query { any; };` pada `DNS Master` dan `Slave`. Selain itu, `NS` (Name Server) juga diperlukan karena `NS` digunakan dalam delegasi zona `DNS` untuk menggunakan authoritative name server yang telah ditentukan.
 
-Di DNS Master, kita harus memasukkan entri `ns1      IN       A     192.173.2.2     ; IP Werkudara` ini untuk mendapatkan otoritas atas Werkudara. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Master`.
-
-## Yudhistira
-```
-echo ';
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     abimanyu.b05.com. root.abimanyu.b05.com. (
-                        2023101001      ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
-                         604800 )       ; Negative Cache TTL
-;
-@            IN     NS      abimanyu.b05.com.
-@            IN     A       10.11.1.2     ; IP Yudhistira
-www          IN     CNAME   abimanyu.b05.com.
-parikesit    IN     A       10.11.3.3     ; IP Abimanyu
-ns1          IN     A       10.11.2.2     ; IP Werkudara
-baratayuda   IN     NS      ns1' > /etc/bind/jarkom/abimanyu.b05.com
-
-echo "options {
-    directory \"/var/cache/bind\";
-
-    // If there is a firewall between you and nameservers you want
-    // to talk to, you may need to fix the firewall to allow multiple
-    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
-
-    // If your ISP provided one or more IP addresses for stable
-    // nameservers, you probably want to use them as forwarders.
-    // Uncomment the following block, and insert the addresses replacing
-    // the all-0's placeholder.
-
-    // forwarders {
-    //      0.0.0.0;
-    // };
-
-    //========================================================================
-    // If BIND logs error messages about the root key being expired,
-    // you will need to update your keys.  See https://www.isc.org/bind-keys
-    //========================================================================
-    //dnssec-validation auto;
-
-    allow-query { any; };
-    auth-nxdomain no;
-    listen-on-v6 { any; };
-};" > /etc/bind/named.conf.options
-
-```
-jangan lupa
-```
-service bind9 restart
-```
-Pada `DNS Slave`, kita harus mengarahkan zona ke `DNS Master` agar otoritasnya dapat berjalan. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Slave`.
-
-## Werkudara
+Di DNS Master, kita harus memasukkan entri `ns1      IN       A     10.11.2.2     ; IP Werkudara` ini untuk mendapatkan otoritas atas Werkudara. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Master`.
 
 ```
 echo 'zone "baratayuda.abimanyu.b05.com" {
@@ -370,7 +338,11 @@ jangan lupa
 ```
 service bind9 restart
 ```
-
+cek dengan
+```
+ping baratayuda.abimanyu.b05.com -c 5
+ping www.baratayuda.abimanyu.b05.com -c 5
+```
 # Question 8
 
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
@@ -404,6 +376,11 @@ www.rjp         IN      CNAME   rjp.baratayuda.abimanyu.b05.com.' > /etc/bind/ba
 jangan lupa
 ```
 service bind9 restart
+```
+cek dengan
+```
+ping rjp.baratayuda.abimanyu.b05.com -c 5
+ping www.rjp.baratayuda.abimanyu.b05.com -c 5
 ```
 
 # Question 9
@@ -448,14 +425,21 @@ restart
 ```
 service nginx restart
 ```
+uji dengan
+```
+lynx http://10.11.3.5
+lynx http://arjuna.b05.com
+lynx http://www.arjuna.b05.com
+curl http://www.arjuna.b05.com
+```
 
-## Abimanyu, Wisanggeni, dan Prabukusuma
-run `shell` pada masing-masing
+## Prabukusuma
+
 ```
 service php7.0-fpm start
 
 echo 'server {
-        listen 80;
+        listen 8001;
 
         root /var/www/jarkom;
         index index.php index.html index.htm index.nginx-debian.html;
@@ -468,7 +452,7 @@ echo 'server {
 
         location ~ \.php$ {
                 include snippets/fastcgi-php.conf;
-                fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+                fastcgi_pass unix:/run/php/php7.2-fpm.sock;
         }
 
         location ~ /\.ht {
@@ -479,10 +463,124 @@ echo 'server {
 ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
 
 rm /etc/nginx/sites-enabled/default
+
 ```
 jangan lupa
 ```
 service nginx restart
+```
+uji dengan 
+```
+lynx http://10.11.3.2:8001
+curl http://10.11.3.2:8001
+```
+
+# Abimanyu
+
+```
+service php7.2-fpm start
+
+echo 'server {
+        listen 8002;
+
+        root /var/www/jarkom;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}' > /etc/nginx/sites-available/jarkom
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+
+rm /etc/nginx/sites-enabled/default
+
+```
+jangan lupa
+```
+service nginx restart
+```
+uji dengan 
+```
+lynx http://10.11.3.3:8002
+curl http://10.11.3.3:8002
+```
+
+# Wisanggeni
+
+```
+
+service php7.2-fpm start
+
+echo 'server {
+        listen 8003;
+
+        root /var/www/jarkom;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}' > /etc/nginx/sites-available/jarkom
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+
+rm /etc/nginx/sites-enabled/default
+
+```
+jangan lupa
+```
+service nginx restart
+```
+uji dengan
+```
+lynx http://10.11.3.4:8003
+curl http://11.11.3.4:8003
+```
+
+## Yudhistira
+
+```
+echo ';
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     arjuna.b05.com. root.arjuna.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      arjuna.b05.com.
+@       IN      A       10.11.3.5     ; IP Arjuna
+www     IN      CNAME   arjuna.b05.com.' > /etc/bind/jarkom/arjuna.b05.com
+```
+jangan lupa
+```
+service bind9 restart
 ```
 ## Client Nakula
 
@@ -514,13 +612,15 @@ upstream backend {
 }
 ```
 
-## Prabukusuma, Abimanyu, dan Wisanggeni
+## Prabukusuma
 
 X merupakan port yang telah disesuaikan dengan setiap `worker` secara individual.
 
 ```
+service php7.2-fpm start
+
 echo 'server {
-        listen 800X;
+        listen 8001;
 
         root /var/www/jarkom;
         index index.php index.html index.htm index.nginx-debian.html;
@@ -533,15 +633,95 @@ echo 'server {
 
         location ~ \.php$ {
                 include snippets/fastcgi-php.conf;
-                fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+                fastcgi_pass unix:/run/php/php7.2-fpm.sock;
         }
 
         location ~ /\.ht {
                 deny all;
         }
 }' > /etc/nginx/sites-available/jarkom
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+
+rm /etc/nginx/sites-enabled/default
+```
+jangan lupa
+```
+service nginx restart
+```
+## Abimanyu
+
+```
+service php7.2-fpm start
+
+echo 'server {
+        listen 8002;
+
+        root /var/www/jarkom;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}' > /etc/nginx/sites-available/jarkom
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+
+rm /etc/nginx/sites-enabled/default
+
+```
+jangan lupa
+```
+service nginx restart
 ```
 
+## Wisanggeni
+
+```
+service php7.2-fpm start
+
+echo 'server {
+        listen 8003;
+
+        root /var/www/jarkom;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        location / {
+                try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+        }
+
+        location ~ /\.ht {
+                deny all;
+        }
+}' > /etc/nginx/sites-available/jarkom
+
+ln -s /etc/nginx/sites-available/jarkom /etc/nginx/sites-enabled/jarkom
+
+rm /etc/nginx/sites-enabled/default
+
+```
+jangan lupa
+```
+service nginx restart
+```
 # Question 11
 
 Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abimanyu dengan web server www.abimanyu.yyy.com. Pertama dibutuhkan web server dengan DocumentRoot pada /var/www/abimanyu.yyy
@@ -549,8 +729,8 @@ Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abim
 Untuk menyelesaikan tugas ini, diperlukan beberapa pengaturan. Salah satunya adalah yang berkaitan dengan konfigurasi `Yudhistira`, di mana kita akan mengalihkan alamat IP yang sebelumnya ditujukan ke `Werkudara` agar sekarang menuju `Abimanyu`. Selain itu, diperlukan penggunaan `ServerAlias` agar memungkinkan penggunaan www di masa yang akan datang.
 
 ## Yudhistira
+
 ```
-# 11
 echo ';
 ; BIND data file for local loopback interface
 ;
@@ -566,8 +746,9 @@ $TTL    604800
 @       IN      A       10.11.3.3     ; IP Abimanyu
 www     IN      CNAME   abimanyu.b05.com.
 parikesit IN    A       10.11.3.3     ; IP Abimanyu
-ns1     IN      A       10.11.2.2     ; IP Werkudara
+ns1     IN      A       11.11.2.2     ; IP Werkudara
 baratayuda IN   NS      ns1' > /etc/bind/jarkom/abimanyu.b05.com
+
 ```
 jangan lupa
 ```
@@ -591,6 +772,7 @@ echo -e '<VirtualHost *:80>
 </VirtualHost>' > /etc/apache2/sites-available/abimanyu.b05.com.conf
 
 a2ensite abimanyu.b05.com.conf
+
 ```
 jangan lupa
 ```
@@ -599,6 +781,7 @@ service apache2 restart
 ## Cek pada Client
 ```
 lynx abimanyu.b05.com
+curl abimanyu.b05.com
 ```
 
 # Question 12
@@ -630,6 +813,7 @@ echo -e '<VirtualHost *:80>
   ErrorLog ${APACHE_LOG_DIR}/error.log
   CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>' > /etc/apache2/sites-available/abimanyu.b05.com.conf
+
 ```
 jangan lupa
 ```
@@ -637,8 +821,8 @@ service apache2 restart
 ```
 ## Client
 ```
-lynx abimanyu.a09.com/home
-curl abimanyu.a09.com/home
+lynx abimanyu.b05.com/home
+curl abimanyu.b05.com/home
 ```
 
 # Question 13
@@ -701,6 +885,9 @@ echo -e '<VirtualHost *:80>
   CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
 
+```
+jangan lupa
+```
 service apache2 restart
 ```
 ## Client
@@ -716,6 +903,7 @@ Buatlah kustomisasi halaman error pada folder /error untuk mengganti error kode 
 Untuk halaman HTML `error`, kita menggunakan file yang disediakan dalam `resources`, yang dapat ditemukan di direktori parikesit.abimanyu.b05.com/public/error/. Di dalam direktori tersebut, terdapat dua filr, yaitu `403.html` dan `404.html`. Selain itu, kita memanfaatkan `ErrorDocument` yang bertujuan untuk mengarahkan ke berkas yang sesuai ketika terjadi masalah saat mengakses domain yang telah ada sebelumnya.
 
 ```
+
 echo -e '<VirtualHost *:80>
   ServerAdmin webmaster@localhost
   DocumentRoot /var/www/parikesit.abimanyu.b05
@@ -739,7 +927,9 @@ echo -e '<VirtualHost *:80>
   ErrorLog ${APACHE_LOG_DIR}/error.log
   CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
-
+```
+jangan lupa
+```
 service apache2 restart
 ```
 ## Client
@@ -783,6 +973,10 @@ echo -e '<VirtualHost *:80>
   ErrorLog ${APACHE_LOG_DIR}/error.log
   CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
+```
+jangan lupa
+```
+service apache2 restart
 ```
 ## Client
 ```
@@ -868,7 +1062,10 @@ echo -e '<VirtualHost *:14000 *:14400>
   CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>' > /etc/apache2/sites-available/rjp.baratayuda.abimanyu.b05.com.conf
 
+htpasswd -c -b /etc/apache2/.htpasswd Wayang baratayudab05
+
 a2ensite rjp.baratayuda.abimanyu.b05.com.conf
+
 ```
 jangan lupa
 ```
@@ -895,6 +1092,7 @@ Untuk mengalihkan otomatis saat mengakses IP dari Abimanyu ke www.abimanyu.b05.c
 ## Abimanyu
 
 ```
+
 echo -e '<VirtualHost *:80>
     ServerAdmin webmaster@abimanyu.b05.com
     DocumentRoot /var/www/html
@@ -905,10 +1103,14 @@ echo -e '<VirtualHost *:80>
     Redirect / http://www.abimanyu.b05.com/
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 ```
+jangan lupa
+```
+service apache2 restart
+```
 Testing
 ```
 apache2ctl configtest
-service apache2 restart
+
 ```
 ## Client
 
@@ -938,6 +1140,11 @@ RewriteRule abimanyu http://parikesit.abimanyu.b05.com/public/images/abimanyu.pn
 ubah config dan pakai `AllowOverride All` untuk mengkonfigurasi `.httaccess`.
 
 ```
+echo 'RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/public/images/(.*)(abimanyu)(.*\.(png|jpg))
+RewriteCond %{REQUEST_URI} !/public/images/abimanyu.png
+RewriteRule abimanyu http://parikesit.abimanyu.b05.com/public/images/abimanyu.png$1 [L,R=301]' > /var/www/parikesit.abimanyu.b05/.htaccess
+
 echo -e '<VirtualHost *:80>
   ServerAdmin webmaster@localhost
   DocumentRoot /var/www/parikesit.abimanyu.b05
@@ -968,6 +1175,7 @@ echo -e '<VirtualHost *:80>
   ErrorLog ${APACHE_LOG_DIR}/error.log
   CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
+
 ```
 jangan lupa
 ```
@@ -976,7 +1184,9 @@ service apache2 restart
 ## Client
 
 ```
-lynx parikesit.abimanyu.b05.com/public/images/notis-abimanyu.png
-lynx parikesit.abimanyu.b05.com/public/images/abimanyu-loveee.jpg
+lynx parikesit.abimanyu.b05.com/public/images/not-abimanyu.png
+lynx parikesit.abimanyu.b05.com/public/images/abimanyu-student.jpg
 lynx parikesit.abimanyu.b05.com/public/images/abimanyu.png
+lynx parikesit.abimanyu.b05.com/public/images/notabimanyujustmuseum.177013
+
 ```
