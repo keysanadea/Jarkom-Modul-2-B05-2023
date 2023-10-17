@@ -372,6 +372,13 @@ jangan lupa
 ```
 service bind9 restart
 ```
+Test
+```
+ping baratayuda.abimanyu.b05.com -c 5
+ping www.baratayuda.abimanyu.b05.com -c 5
+```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/8f78244f-ec8b-467b-bd68-06ea06ef287a)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/11724c24-c278-4be0-9609-6ce78fe2ecdd)
 
 # Question 8
 
@@ -407,6 +414,13 @@ jangan lupa
 ```
 service bind9 restart
 ```
+Test
+```
+# ping rjp.baratayuda.abimanyu.b05.com -c 5
+# ping www.rjp.baratayuda.abimanyu.b05.com -c 5
+```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/51815f17-c323-4dd9-b7ef-2c160f9ecf30)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/c39e7204-7da3-4cef-b90b-6be123a60c41)
 
 # Question 9
 
@@ -449,6 +463,12 @@ rm /etc/nginx/sites-enabled/default
 restart
 ```
 service nginx restart
+```
+Test
+```
+ping rjp.baratayuda.abimanyu.b05.com -c 5
+ping www.rjp.baratayuda.abimanyu.b05.com -c 5
+
 ```
 
 ## Abimanyu, Wisanggeni, dan Prabukusuma
