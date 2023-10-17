@@ -663,8 +663,8 @@ service apache2 restart
 ```
 ## Client
 ```
-lynx abimanyu.a09.com/home
-curl abimanyu.a09.com/home
+lynx abimanyu.b05.com/home
+curl abimanyu.b05.com/home
 ```
 ![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/90cf8122-62c2-4cf7-8bb1-8187dd80f4d8)
 
