@@ -116,6 +116,38 @@ ping www.abimanyu.b05.com -c 5
 
 Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain parikesit.abimanyu.yyy.com yang diatur DNS-nya di Yudhistira dan mengarah ke Abimanyu.
 
+Menyiapkan konfigurasi awal. Untuk subdomain, diperlukan penambahan pengaturan ```parikesit``` dengan tipe ```A``` yang mengarahkan ke alamat IP Abimanyu.  Dan juga menambahkan 
+``` 
+parikesit IN    A       10.11.3.3     ; IP Abimanyu' >
+/etc/bind/jarkom/abimanyu.b05.com
+```
+```
+echo '
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     abimanyu.b05.com. root.abimanyu.b05.com. (
+                        2023101001      ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      abimanyu.b05.com.
+@       IN      A       10.11.1.2     ; IP Yudhistira
+www     IN      CNAME   abimanyu.b05.com.
+parikesit IN    A       10.11.3.3     ; IP Abimanyu' > /etc/bind/jarkom/abimanyu.b05.com
+```
+jangan lupa prompt berikut setelah save
+```
+service bind9 restart
+```
+cek dengan
+```
+ping parikesit.abimanyu.b05.com -c 5
+```
+
 ### Question 5
 
 Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
