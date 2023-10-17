@@ -7,7 +7,7 @@ Group Members:
 |5025211028|Keysa Anadea Aqiva Ajie|
 |5025221202|Hilmy Septian Nursyekha|
    
-### Question 1
+# Question 1
 
 Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjuna merupakan Load Balancer yang terdiri dari beberapa Web Server yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Buatlah topologi dengan pembagian sebagai berikut. Folder topologi dapat diakses pada drive berikut (Topologi 1)
 
@@ -21,7 +21,7 @@ ping google.com -c 2
 ![No1](Gambar/Cuplikan%20layar%202023-10-17%20144716.png)
 ![No2](Gambar/Cuplikan%20layar%202023-10-17%20144917.png)
 
-### Question 2
+# Question 2
 
 Buatlah website utama pada node arjuna dengan akses ke arjuna.yyy.com dengan alias www.arjuna.yyy.com dengan yyy merupakan kode kelompok.
 
@@ -65,7 +65,7 @@ ping www.arjuna.b05.com -c 5
 
 ![No2](Gambar/No2.png)
 
-### Question 3
+# Question 3
 
 Dengan cara yang sama seperti soal nomor 2, buatlah website utama dengan akses ke abimanyu.yyy.com dan alias www.abimanyu.yyy.com.
 
@@ -112,7 +112,7 @@ ping www.abimanyu.b05.com -c 5
 ```
 ![No3](Gambar/No3.png)
 
-### Question 4
+# Question 4
 
 Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain parikesit.abimanyu.yyy.com yang diatur DNS-nya di Yudhistira dan mengarah ke Abimanyu.
 
@@ -148,7 +148,7 @@ cek dengan
 ping parikesit.abimanyu.b05.com -c 5
 ```
 
-### Question 5
+# Question 5
 
 Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 
@@ -188,7 +188,7 @@ jangan lupa juga kembalikan `nameserver`
 host -t PTR 10.11.3.3
 ```
 
-### Question 6
+# Question 6
 
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
 
@@ -222,7 +222,7 @@ Jangan lupa
 service bind9 restart
 service bind9 stop
 ```
-# Werkudara sebagai DNS Slave
+## Werkudara sebagai DNS Slave
 
 ```
 echo 'zone "abimanyu.b05.com" {
@@ -241,7 +241,7 @@ ping abimanyu.b05.com -c 5
 ping www.abimanyu.b05.com -c 5
 ```
 
-### Question 7
+# Question 7
 
 Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatlah subdomain khusus untuk perang yaitu baratayuda.abimanyu.yyy.com dengan alias www.baratayuda.abimanyu.yyy.com yang didelegasikan dari Yudhistira ke Werkudara dengan IP menuju ke Abimanyu dalam folder Baratayuda.
 
@@ -250,7 +250,7 @@ Sebelum mulai tugas ini, konfigurasi awal harus dilakukan. Delegasi subdomain me
 
 Di DNS Master, kita harus memasukkan entri `ns1      IN       A     192.173.2.2     ; IP Werkudara` ini untuk mendapatkan otoritas atas Werkudara. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Master`.
 
-# Yudhistira
+## Yudhistira
 ```
 echo ';
 ; BIND data file for local loopback interface
@@ -303,7 +303,7 @@ service bind9 restart
 ```
 Pada `DNS Slave`, kita harus mengarahkan zona ke `DNS Master` agar otoritasnya dapat berjalan. Selain itu, perlu mengaktifkan `allow-query { any; };` di `DNS Slave`.
 
-# Werkudara
+## Werkudara
 
 ```
 echo 'zone "baratayuda.abimanyu.b05.com" {
@@ -363,7 +363,7 @@ jangan lupa
 service bind9 restart
 ```
 
-### Question 8
+# Question 8
 
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses rjp.baratayuda.abimanyu.yyy.com dengan alias www.rjp.baratayuda.abimanyu.yyy.com yang mengarah ke Abimanyu.
 
@@ -373,7 +373,7 @@ rjp             IN      A       10.11.3.3     ; IP Abimanyu
 www.rjp         IN      CNAME   rjp.baratayuda.abimanyu.b05.com.
 ```
 
-# Werkudara
+## Werkudara
 
 ```
 echo ';
@@ -398,7 +398,7 @@ jangan lupa
 service bind9 restart
 ```
 
-### Question 9
+# Question 9
 
 Arjuna merupakan suatu Load Balancer Nginx dengan tiga worker (yang juga menggunakan nginx sebagai webserver) yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Lakukan deployment pada masing-masing worker.
 
@@ -410,7 +410,7 @@ Kemudian, lakukan proses deployment pada setiap worker. Ini melibatkan mengungga
 
 Setelah semua tahap konfigurasi dan deployment selesai, `Arjuna` akan berperan sebagai load balancer yang akan mendistribusikan lalu lintas web ke worker yang tersedia.
 
-# Arjuna
+## Arjuna
 ```
 echo 'upstream backend {
   server 10.11.3.2; # IP Prabukusuma
@@ -441,7 +441,7 @@ restart
 service nginx restart
 ```
 
-# Abimanyu, Wisanggeni, dan Prabukusuma
+## Abimanyu, Wisanggeni, dan Prabukusuma
 run `shell` pada masing-masing
 ```
 service php7.0-fpm start
@@ -476,7 +476,7 @@ jangan lupa
 ```
 service nginx restart
 ```
-# Client Nakula
+## Client Nakula
 
 Lakukan test berikut 
 ```
@@ -487,7 +487,7 @@ lynx http://10.11.3.5
 lynx http://arjuna.b05.com
 ```
 
-### Question 10
+# Question 10
 
 Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan server_name pada soal nomor 1. Untuk melakukan pengecekan akses alamat web tersebut kemudian pastikan worker yang digunakan untuk menangani permintaan akan berganti ganti secara acak. Untuk webserver di masing-masing worker wajib berjalan di port 8001-8003. Contoh
     - Prabukusuma:8001
@@ -496,7 +496,7 @@ Kemudian gunakan algoritma Round Robin untuk Load Balancer pada Arjuna. Gunakan 
 
 Setelah berhasil menyelesaikan langkah ke-9 dalam proses deployment, langkah selanjutnya adalah melakukan penyesuaian pada port masing-masing worker agar sesuai dengan port yang telah ditentukan, yaitu `Prabukusuma:8001, Abimanyu:8002, dan Wisanggeni:8003`. Selain itu, diperlukan perubahan pada konfigurasi port `load-balancing` dengan menambahkan `:800X` pada setiap server.
 
-# Arjuna (Load Balancing)
+## Arjuna (Load Balancing)
 ```
 upstream backend {
   server 10.11.3.2:8001; # IP Prabukusuma
@@ -505,7 +505,7 @@ upstream backend {
 }
 ```
 
-# Prabukusuma, Abimanyu, dan Wisanggeni
+## Prabukusuma, Abimanyu, dan Wisanggeni
 
 X merupakan port yang telah disesuaikan dengan setiap `worker` secara individual.
 
@@ -533,13 +533,13 @@ echo 'server {
 }' > /etc/nginx/sites-available/jarkom
 ```
 
-### Question 11
+# Question 11
 
 Selain menggunakan Nginx, lakukan konfigurasi Apache Web Server pada worker Abimanyu dengan web server www.abimanyu.yyy.com. Pertama dibutuhkan web server dengan DocumentRoot pada /var/www/abimanyu.yyy
 
 Untuk menyelesaikan tugas ini, diperlukan beberapa pengaturan. Salah satunya adalah yang berkaitan dengan konfigurasi `Yudhistira`, di mana kita akan mengalihkan alamat IP yang sebelumnya ditujukan ke `Werkudara` agar sekarang menuju `Abimanyu`. Selain itu, diperlukan penggunaan `ServerAlias` agar memungkinkan penggunaan www di masa yang akan datang.
 
-# Yudhistira
+## Yudhistira
 ```
 # 11
 echo ';
@@ -564,7 +564,7 @@ jangan lupa
 ```
 service bind9 restart
 ```
-# Abimanyu
+## Abimanyu
 ```
 cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/abimanyu.b05.com.conf
 
@@ -587,12 +587,12 @@ jangan lupa
 ```
 service apache2 restart
 ```
-# Cek pada Client
+## Cek pada Client
 ```
 lynx abimanyu.b05.com
 ```
 
-### Question 12
+# Question 12
 
 Setelah itu ubahlah agar url www.abimanyu.yyy.com/index.php/home menjadi www.abimanyu.yyy.com/home.
 
@@ -604,7 +604,7 @@ Di sini, kita memanfaatkan `Directory` yang akan melakukan pengubahan (rewrite) 
 
 Alias "/home" "/var/www/abimanyu.b05/index.php/home"
 ```
-# Abimanyu
+## Abimanyu
 ```
 echo -e '<VirtualHost *:80>
   ServerAdmin webmaster@localhost
@@ -626,19 +626,19 @@ jangan lupa
 ```
 service apache2 restart
 ```
-# Client
+## Client
 ```
 lynx abimanyu.a09.com/home
 curl abimanyu.a09.com/home
 ```
 
-### Question 13
+# Question 13
 
 Selain itu, pada subdomain www.parikesit.abimanyu.yyy.com, DocumentRoot disimpan pada /var/www/parikesit.abimanyu.yyy
 
 Hanya diperlukan setup `ServerName` dan `ServerAlias`
 
-# Abimanyu
+## Abimanyu
 
 ```
 echo -e '<VirtualHost *:80>
@@ -657,19 +657,19 @@ jangan lupa
 ```
 service apache2 restart
 ```
-# Client
+## Client
 ```
 lynx parikesit.abimanyu.b05.com
 curl parikesit.abimanyu.b05.com
 ```
 
-### Question 14
+# Question 14
 
 Pada subdomain tersebut folder /public hanya dapat melakukan directory listing sedangkan pada folder /secret tidak dapat diakses (403 Forbidden).
 
 Karena kita ingin mengizinkan publik agar dapat melihat directory  `listing`, kita menggunakan opsi `Options +Indexes`. Sementara untuk mencegah akses ke suatu folder, kita dapat menggunakan opsi `Option -Indexes`.
 
-# Abimanyu 
+## Abimanyu 
 ```
 echo -e '<VirtualHost *:80>
   ServerAdmin webmaster@localhost
@@ -694,13 +694,13 @@ echo -e '<VirtualHost *:80>
 
 service apache2 restart
 ```
-# Client
+## Client
 ```
 lynx parikesit.abimanyu.b05.com/public
 lynx parikesit.abimanyu.b05.com/secret
 ```
 
-### Question 15
+# Question 15
 
 Buatlah kustomisasi halaman error pada folder /error untuk mengganti error kode pada Apache. Error kode yang perlu diganti adalah 404 Not Found dan 403 Forbidden.
 
@@ -733,20 +733,20 @@ echo -e '<VirtualHost *:80>
 
 service apache2 restart
 ```
-# Client
+## Client
 ```
 lynx parikesit.abimanyu.b05.com/testerror
 lynx parikesit.abimanyu.b05.com/secret
 ```
 
-### Question 16
+# Question 16
 
 Buatlah suatu konfigurasi virtual host agar file asset www.parikesit.abimanyu.yyy.com/public/js menjadi 
 www.parikesit.abimanyu.yyy.com/js 
 
 Di sini, langkah yang perlu diambil adalah mengggunakan `Alias "/js" "/var/www/parikesit.abimanyu.b09/public/js"` guna membuat alamat virtual host lebih singkat. Selain itu, kami menggunakan `ServerName` dan `ServerAlias` untuk memastikan agar virtual host berjalan dengan baik.
 
-# Abimanyu
+## Abimanyu
 
 ```
 echo -e '<VirtualHost *:80>
@@ -774,22 +774,22 @@ echo -e '<VirtualHost *:80>
   CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>' > /etc/apache2/sites-available/parikesit.abimanyu.b05.com.conf
 ```
-# Client
+## Client
 ```
 lynx parikesit.abimanyu.b05.com/js
 ```
-### Question 17
+# Question 17
 
 Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
 
-### Question 18
+# Question 18
 
 Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
 
-### Question 19
+# Question 19
 
 Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihkan ke www.abimanyu.yyy.com (alias)
 
-### Question 20
+# Question 20
 
 Karena website www.parikesit.abimanyu.yyy.com semakin banyak pengunjung dan banyak gambar gambar random, maka ubahlah request gambar yang memiliki substring “abimanyu” akan diarahkan menuju abimanyu.png.
