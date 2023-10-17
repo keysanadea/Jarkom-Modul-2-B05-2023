@@ -711,6 +711,8 @@ service apache2 restart
 lynx parikesit.abimanyu.b05.com/public
 lynx parikesit.abimanyu.b05.com/secret
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/d50b7bac-1ed3-4ebe-bb81-a9f8f0aa1573)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/d0cb7de5-fa8d-450d-8391-2c230c4a92dc)
 
 # Question 15
 
@@ -750,6 +752,8 @@ service apache2 restart
 lynx parikesit.abimanyu.b05.com/testerror
 lynx parikesit.abimanyu.b05.com/secret
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/4149cc18-f6ff-487c-b03b-b275bc200198)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/35eea9d1-e9bd-4f81-ad63-10c7fb87e6d3)
 
 # Question 16
 
@@ -791,6 +795,8 @@ echo -e '<VirtualHost *:80>
 ```
 lynx parikesit.abimanyu.b05.com/js
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/bb537776-edd5-4c8b-9a09-462c6fc1aa0f)
+
 # Question 17
 
 Agar aman, buatlah konfigurasi agar www.rjp.baratayuda.abimanyu.yyy.com hanya dapat diakses melalui port 14000 dan 14400.
@@ -842,6 +848,10 @@ service apache2 restart
 lynx rjp.baratayuda.abimanyu.b05.com:14000
 lynx rjp.baratayuda.abimanyu.b05.com:14400
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/99676b35-78b8-40a8-aaeb-9df826cd9c70)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/81df09a3-5c1b-4e3d-aac0-f5c0ecaf71a4)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/54af77d6-1925-4c07-a5ba-e221928ea6fb)
+
 # Question 18
 
 Untuk mengaksesnya buatlah autentikasi username berupa “Wayang” dan password “baratayudayyy” dengan yyy merupakan kode kelompok. Letakkan DocumentRoot pada /var/www/rjp.baratayuda.abimanyu.yyy.
@@ -888,7 +898,9 @@ htpasswd -c -b /etc/apache2/.htpasswd Wayang baratayudab05
 lynx rjp.baratayuda.abimanyu.b05.com:14000
 lynx rjp.baratayuda.abimanyu.b05.com:14400
 ```
-
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/99676b35-78b8-40a8-aaeb-9df826cd9c70)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/81df09a3-5c1b-4e3d-aac0-f5c0ecaf71a4)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/54af77d6-1925-4c07-a5ba-e221928ea6fb)
 # Question 19
 
 Buatlah agar setiap kali mengakses IP dari Abimanyu akan secara otomatis dialihkan ke www.abimanyu.yyy.com (alias)
@@ -918,6 +930,7 @@ service apache2 restart
 ```
 lynx 10.11.3.3
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/0e8c06ce-6758-4607-8d69-0f29d294a5f9)
 
 # Question 20
 
@@ -983,3 +996,7 @@ lynx parikesit.abimanyu.b05.com/public/images/notis-abimanyu.png
 lynx parikesit.abimanyu.b05.com/public/images/abimanyu-loveee.jpg
 lynx parikesit.abimanyu.b05.com/public/images/abimanyu.png
 ```
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/2eacbb22-2c2c-4d46-b6d6-718e2916ab71)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/6ed4b457-fc0d-49f1-97f3-0bf4f9845306)
+![image](https://github.com/keysanadea/Jarkom-Modul-2-B05-2023/assets/88714452/4bf7a0fd-cc40-453d-90cb-e050d92dab74)
+
